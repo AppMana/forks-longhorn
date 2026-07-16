@@ -169,15 +169,14 @@ spec:
 {{ default .Values.global.tolerations .Values.longhornManager.tolerations | toYaml | indent 6 }}
         {{- end }}
       {{- end }}
-      {{- if or .Values.global.nodeSelector .Values.longhornManager.nodeSelector .Values.global.cattle.windowsCluster.enabled }}
       nodeSelector:
+        kubernetes.io/os: linux
         {{- if and .Values.global.cattle.windowsCluster.enabled .Values.global.cattle.windowsCluster.nodeSelector }}
-{{ toYaml .Values.global.cattle.windowsCluster.nodeSelector | indent 8 }}
+{{ toYaml (omit .Values.global.cattle.windowsCluster.nodeSelector "kubernetes.io/os") | indent 8 }}
         {{- end }}
         {{- if or .Values.global.nodeSelector .Values.longhornManager.nodeSelector }}
-{{ default .Values.global.nodeSelector .Values.longhornManager.nodeSelector | toYaml | indent 8 }}
+{{ omit (default .Values.global.nodeSelector .Values.longhornManager.nodeSelector) "kubernetes.io/os" | toYaml | indent 8 }}
         {{- end }}
-      {{- end }}
       serviceAccountName: longhorn-service-account
   updateStrategy:
 {{ toYaml .Values.longhornManager.updateStrategy | indent 4 }}
