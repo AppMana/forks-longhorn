@@ -5,15 +5,15 @@ image:
     engine:
       registry: ghcr.io
       repository: appmana/longhorn-engine
-      tag: windows-v1-20260717.3
+      tag: windows-v1-20260717.4
     manager:
       registry: ghcr.io
       repository: appmana/longhorn-manager
-      tag: windows-v1-20260717.3
+      tag: windows-v1-20260717.4
     instanceManager:
       registry: ghcr.io
       repository: appmana/longhorn-instance-manager
-      tag: windows-v1-20260717.3
+      tag: windows-v1-20260717.4
 
 # Every stock workload contains Linux commands or paths. Windows equivalents
 # are separate so ordinary Longhorn upgrades retain their normal lifecycle.
