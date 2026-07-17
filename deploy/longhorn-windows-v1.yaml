@@ -7,6 +7,28 @@
 # ghcr.io/<owner>/{longhorn-manager,longhorn-engine,longhorn-instance-manager,
 # csi-proxy}:<shared-tag>. Engine upgrade tests use a second, immutable engine
 # tag rather than repointing the first tag.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: longhorn-windows-engine-image-capability-probe
+rules:
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: longhorn-windows-engine-image-capability-probe
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: longhorn-windows-engine-image-capability-probe
+subjects:
+  - kind: ServiceAccount
+    name: longhorn-service-account
+    namespace: longhorn-system
+---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -226,3 +248,47 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+---
+# Expose the standard OS label through CSI topology before a delayed-binding
+# Windows PVC selects a node. Linux CSI nodes already source this key from the
+# Kubernetes Node object; the Windows HostProcess service reports "windows".
+apiVersion: longhorn.io/v1beta2
+kind: Setting
+metadata:
+  name: csi-allowed-topology-keys
+  namespace: longhorn-system
+value: kubernetes.io/os
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-windows-ntfs
+provisioner: driver.longhorn.io
+allowVolumeExpansion: false
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  dataEngine: v1
+  dataLocality: best-effort
+  fsType: ntfs
+  numberOfReplicas: "3"
+allowedTopologies:
+  - matchLabelExpressions:
+      - key: kubernetes.io/os
+        values: [windows]
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: longhorn-windows-refs
+provisioner: driver.longhorn.io
+allowVolumeExpansion: false
+volumeBindingMode: WaitForFirstConsumer
+parameters:
+  dataEngine: v1
+  dataLocality: best-effort
+  fsType: refs
+  numberOfReplicas: "3"
+allowedTopologies:
+  - matchLabelExpressions:
+      - key: kubernetes.io/os
+        values: [windows]

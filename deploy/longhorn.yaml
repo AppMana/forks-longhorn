@@ -4487,6 +4487,9 @@ rules:
   resources: ["pods"]
   verbs: ["get", "list", "watch", "delete", "deletecollection"]
 - apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create"]
+- apiGroups: [""]
   resources: ["secrets", "services", "endpoints", "configmaps", "serviceaccounts", "pods/log"]
   verbs: ["get", "list", "watch"]
 - apiGroups: [""]
@@ -4733,8 +4736,6 @@ spec:
         app.kubernetes.io/version: v1.12.0
         app: longhorn-manager
     spec:
-      nodeSelector:
-        kubernetes.io/os: linux
       containers:
       - name: longhorn-manager
         image: docker.io/longhornio/longhorn-manager:v1.12.0
@@ -4834,6 +4835,8 @@ spec:
           secretName: longhorn-grpc-tls
           optional: true
       priorityClassName: "longhorn-critical"
+      nodeSelector:
+        kubernetes.io/os: linux
       serviceAccountName: longhorn-service-account
   updateStrategy:
     rollingUpdate:

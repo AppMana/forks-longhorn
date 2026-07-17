@@ -4489,6 +4489,9 @@ rules:
   resources: ["pods"]
   verbs: ["get", "list", "watch", "delete", "deletecollection"]
 - apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create"]
+- apiGroups: [""]
   resources: ["secrets", "services", "endpoints", "configmaps", "serviceaccounts", "pods/log"]
   verbs: ["get", "list", "watch"]
 - apiGroups: [""]
@@ -4895,6 +4898,8 @@ spec:
           secretName: longhorn-grpc-tls
           optional: true
       priorityClassName: "longhorn-critical"
+      nodeSelector:
+        kubernetes.io/os: linux
       serviceAccountName: longhorn-service-account
   updateStrategy:
     rollingUpdate:
