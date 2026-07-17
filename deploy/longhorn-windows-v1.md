@@ -27,5 +27,4 @@ harness provisions these requirements. `longhorn-windows-ntfs` and
 The Windows V1 capability set is intentionally fail-closed. RWO/RWOP volumes
 may use mixed Linux/Windows replicas. RWX and strict-local requirements cannot
 place replicas on Windows until the exact engine image advertises those role
-capabilities. ReFS is exposed for workloads and remains a known expected-fail
-test until its CSI formatting path is complete.
+capabilities. NTFS and ReFS are both exposed as Windows workload filesystems.
