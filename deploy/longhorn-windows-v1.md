@@ -28,6 +28,25 @@ The Windows CSI node service uses its manager's node data address; Windows manag
 fall back to the kubelet's local API endpoint when an HNS implementation does
 not make the Kubernetes Service VIP reachable from HostProcess containers.
 
+Mixed Linux/Windows replicas require bidirectional reachability between every
+engine and replica process. If the primary pod network is not routed to Windows
+hosts, create a `NetworkAttachmentDefinition` that attaches Linux Longhorn pods
+to the Windows storage network and include the optional values file:
+
+```sh
+helm upgrade --install longhorn ./chart \
+  --namespace longhorn-system --create-namespace \
+  --values deploy/longhorn-windows-v1-values.yaml \
+  --values deploy/longhorn-windows-v1-storage-network-values.yaml
+```
+
+Windows HostProcess instance managers intentionally do not receive the Multus
+annotation: they advertise their node data address. Linux instance managers
+retain Longhorn's existing storage-network behavior and advertise the secondary
+CNI address. The VM test harness provisions RKE2's bundled Multus and
+Whereabouts, a macvlan attachment on the dedicated OVS-backed data NIC, and the
+`kube-system/longhorn-storage` definition used above.
+
 The Windows V1 capability set is intentionally fail-closed. RWO/RWOP volumes
 may use mixed Linux/Windows replicas. RWX and strict-local requirements cannot
 place replicas on Windows until the exact engine image advertises those role

@@ -1,0 +1,6 @@
+# Optional companion for clusters whose primary pod network is not reachable
+# from Windows HostProcess containers. The referenced NetworkAttachmentDefinition
+# must put Linux instance-manager pods on the same routable storage network as
+# the Windows node addresses.
+defaultSettings:
+  storageNetwork: kube-system/longhorn-storage
