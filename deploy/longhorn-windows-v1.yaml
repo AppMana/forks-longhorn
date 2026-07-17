@@ -249,9 +249,9 @@ spec:
             - --driver-name=driver.longhorn.io
             - --version=windows-v1-20260717.2
             - --node-id=$(KUBE_NODE_NAME)
-            # Each Windows node has a local HostProcess manager. Using its
-            # loopback API avoids coupling CSI startup to overlay Service VIPs.
-            - --manager-url=http://127.0.0.1:9500/v1
+            # Each Windows node has a local host-network manager. Use the node
+            # data address without coupling CSI startup to overlay Service VIPs.
+            - --manager-url=http://$(NODE_IP):9500/v1
             - --endpoint=$(CSI_ENDPOINT)
           env:
             - name: CSI_ENDPOINT
@@ -260,6 +260,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
 ---
 # Keep the Linux and Windows controllers on the same multi-platform engine and
 # instance-manager indexes. Applying this add-on after the chart updates the

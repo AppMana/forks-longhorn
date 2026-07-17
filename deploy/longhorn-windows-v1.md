@@ -24,7 +24,7 @@ Windows nodes must be Server editions with HostProcess support, a running
 harness provisions these requirements and opens TCP 3260, 8500-8501, 9500,
 and 10000-20000 on its isolated data network. `longhorn-windows-ntfs` and
 `longhorn-windows-refs` use delayed binding and advertise Windows topology.
-The Windows CSI node service uses its node-local manager API; Windows managers
+The Windows CSI node service uses its manager's node data address; Windows managers
 fall back to the kubelet's local API endpoint when an HNS implementation does
 not make the Kubernetes Service VIP reachable from HostProcess containers.
 
