@@ -68,6 +68,10 @@ spec:
         - name: longhorn-manager
           image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.3
           imagePullPolicy: IfNotPresent
+          securityContext:
+            windowsOptions:
+              hostProcess: true
+              runAsUserName: NT AUTHORITY\SYSTEM
           command:
             - C:\Windows\System32\cmd.exe
             - /S
@@ -173,6 +177,10 @@ spec:
         - name: csi-proxy
           image: ghcr.io/appmana/csi-proxy:windows-v1-20260717.3
           imagePullPolicy: IfNotPresent
+          securityContext:
+            windowsOptions:
+              hostProcess: true
+              runAsUserName: NT AUTHORITY\SYSTEM
           command:
             - C:\Windows\System32\cmd.exe
             - /S
@@ -219,6 +227,10 @@ spec:
         - name: node-driver-registrar
           image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.16.0
           imagePullPolicy: IfNotPresent
+          securityContext:
+            windowsOptions:
+              hostProcess: true
+              runAsUserName: NT AUTHORITY\SYSTEM
           command:
             - C:\Windows\System32\cmd.exe
             - /S
@@ -246,6 +258,10 @@ spec:
         - name: longhorn-csi-plugin
           image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.3
           imagePullPolicy: IfNotPresent
+          securityContext:
+            windowsOptions:
+              hostProcess: true
+              runAsUserName: NT AUTHORITY\SYSTEM
           command:
             - C:\Windows\System32\cmd.exe
             - /S
