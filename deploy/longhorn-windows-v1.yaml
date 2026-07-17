@@ -66,7 +66,7 @@ spec:
           runAsUserName: NT AUTHORITY\SYSTEM
       containers:
         - name: longhorn-manager
-          image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.2
+          image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.3
           imagePullPolicy: IfNotPresent
           command:
             - C:\Windows\System32\cmd.exe
@@ -77,9 +77,9 @@ spec:
             - -d
             - daemon
             - --engine-image
-            - ghcr.io/appmana/longhorn-engine:windows-v1-20260717.2
+            - ghcr.io/appmana/longhorn-engine:windows-v1-20260717.3
             - --instance-manager-image
-            - ghcr.io/appmana/longhorn-instance-manager:windows-v1-20260717.2
+            - ghcr.io/appmana/longhorn-instance-manager:windows-v1-20260717.3
             - --share-manager-image
             - longhornio/longhorn-share-manager:v1.12.0
             - --backing-image-manager-image
@@ -87,7 +87,7 @@ spec:
             - --support-bundle-manager-image
             - longhornio/support-bundle-kit:v0.0.86
             - --manager-image
-            - ghcr.io/appmana/longhorn-manager:windows-v1-20260717.2
+            - ghcr.io/appmana/longhorn-manager:windows-v1-20260717.3
             - --service-account
             - longhorn-service-account
           env:
@@ -171,7 +171,7 @@ spec:
           runAsUserName: NT AUTHORITY\SYSTEM
       containers:
         - name: csi-proxy
-          image: ghcr.io/appmana/csi-proxy:windows-v1-20260717.2
+          image: ghcr.io/appmana/csi-proxy:windows-v1-20260717.3
           imagePullPolicy: IfNotPresent
           command:
             - C:\Windows\System32\cmd.exe
@@ -220,8 +220,14 @@ spec:
           image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.16.0
           imagePullPolicy: IfNotPresent
           command:
-            - csi-node-driver-registrar.exe
+            - C:\Windows\System32\cmd.exe
+            - /S
+            - /C
           args:
+            # HostProcess image files live below the sandbox root on both
+            # containerd 1.x and 2.x. The image PATH intentionally contains
+            # Windows system directories only.
+            - '%CONTAINER_SANDBOX_MOUNT_POINT%\csi-node-driver-registrar.exe'
             - --v=2
             - --csi-address=$(CSI_ENDPOINT)
             - --kubelet-registration-path=$(DRIVER_REG_SOCK_PATH)
@@ -238,7 +244,7 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
         - name: longhorn-csi-plugin
-          image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.2
+          image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.3
           imagePullPolicy: IfNotPresent
           command:
             - C:\Windows\System32\cmd.exe
@@ -247,7 +253,7 @@ spec:
           args:
             - '%CONTAINER_SANDBOX_MOUNT_POINT%\usr\local\bin\longhorn-windows-csi.exe'
             - --driver-name=driver.longhorn.io
-            - --version=windows-v1-20260717.2
+            - --version=windows-v1-20260717.3
             - --node-id=$(KUBE_NODE_NAME)
             # Each Windows node has a local host-network manager. Use the node
             # data address without coupling CSI startup to overlay Service VIPs.
