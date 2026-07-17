@@ -41,8 +41,6 @@ app.kubernetes.io/version: {{ .Chart.AppVersion }}
 {{- define "system_default_registry" -}}
 {{- if .Values.global.cattle.systemDefaultRegistry -}}
 {{- .Values.global.cattle.systemDefaultRegistry -}}
-{{- else -}}
-{{- "docker.io" -}}
 {{- end -}}
 {{- end -}}
 

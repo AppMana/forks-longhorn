@@ -1,0 +1,30 @@
+# Companion values for deploy/longhorn-windows-v1.yaml. The Linux chart owns
+# the control plane; the add-on supplies the Windows HostProcess data path.
+image:
+  longhorn:
+    engine:
+      registry: ghcr.io
+      repository: appmana/longhorn-engine
+      tag: windows-v1-20260717.1
+    manager:
+      registry: ghcr.io
+      repository: appmana/longhorn-manager
+      tag: windows-v1-20260717.1
+    instanceManager:
+      registry: ghcr.io
+      repository: appmana/longhorn-instance-manager
+      tag: windows-v1-20260717.1
+
+# Every stock workload contains Linux commands or paths. Windows equivalents
+# are separate so ordinary Longhorn upgrades retain their normal lifecycle.
+longhornManager:
+  nodeSelector:
+    kubernetes.io/os: linux
+longhornDriver:
+  nodeSelector:
+    kubernetes.io/os: linux
+longhornUI:
+  nodeSelector:
+    kubernetes.io/os: linux
+defaultSettings:
+  systemManagedComponentsNodeSelector: kubernetes.io/os:linux
