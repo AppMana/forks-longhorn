@@ -52,6 +52,7 @@ spec:
     spec:
       serviceAccountName: longhorn-service-account
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       nodeSelector:
         kubernetes.io/os: windows
       tolerations:
@@ -65,17 +66,20 @@ spec:
           runAsUserName: NT AUTHORITY\SYSTEM
       containers:
         - name: longhorn-manager
-          image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.1
+          image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.2
           imagePullPolicy: IfNotPresent
           command:
-            - C:\usr\local\bin\longhorn-manager.exe
+            - C:\Windows\System32\cmd.exe
+            - /S
+            - /C
           args:
+            - '%CONTAINER_SANDBOX_MOUNT_POINT%\usr\local\bin\longhorn-manager.exe'
             - -d
             - daemon
             - --engine-image
-            - ghcr.io/appmana/longhorn-engine:windows-v1-20260717.1
+            - ghcr.io/appmana/longhorn-engine:windows-v1-20260717.2
             - --instance-manager-image
-            - ghcr.io/appmana/longhorn-instance-manager:windows-v1-20260717.1
+            - ghcr.io/appmana/longhorn-instance-manager:windows-v1-20260717.2
             - --share-manager-image
             - longhornio/longhorn-share-manager:v1.12.0
             - --backing-image-manager-image
@@ -83,7 +87,7 @@ spec:
             - --support-bundle-manager-image
             - longhornio/support-bundle-kit:v0.0.86
             - --manager-image
-            - ghcr.io/appmana/longhorn-manager:windows-v1-20260717.1
+            - ghcr.io/appmana/longhorn-manager:windows-v1-20260717.2
             - --service-account
             - longhorn-service-account
           env:
@@ -114,9 +118,10 @@ spec:
               name: recov-backend
           readinessProbe:
             httpGet:
-              path: /v1/healthz
-              port: 9502
-              scheme: HTTPS
+              path: /v1
+              port: 9500
+              scheme: HTTP
+            timeoutSeconds: 5
           volumeMounts:
             - name: longhorn
               mountPath: C:\var\lib\longhorn
@@ -166,11 +171,14 @@ spec:
           runAsUserName: NT AUTHORITY\SYSTEM
       containers:
         - name: csi-proxy
-          image: ghcr.io/appmana/csi-proxy:windows-v1-20260717.1
+          image: ghcr.io/appmana/csi-proxy:windows-v1-20260717.2
           imagePullPolicy: IfNotPresent
           command:
-            - C:\usr\local\bin\csi-proxy.exe
+            - C:\Windows\System32\cmd.exe
+            - /S
+            - /C
           args:
+            - '%CONTAINER_SANDBOX_MOUNT_POINT%\usr\local\bin\csi-proxy.exe'
             - -kubelet-path=C:\var\lib\kubelet
             - -working-dir=C:\var\lib\longhorn
 ---
@@ -196,6 +204,7 @@ spec:
     spec:
       serviceAccountName: longhorn-service-account
       hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       nodeSelector:
         kubernetes.io/os: windows
       tolerations:
@@ -229,15 +238,20 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
         - name: longhorn-csi-plugin
-          image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.1
+          image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.2
           imagePullPolicy: IfNotPresent
           command:
-            - C:\usr\local\bin\longhorn-windows-csi.exe
+            - C:\Windows\System32\cmd.exe
+            - /S
+            - /C
           args:
+            - '%CONTAINER_SANDBOX_MOUNT_POINT%\usr\local\bin\longhorn-windows-csi.exe'
             - --driver-name=driver.longhorn.io
-            - --version=windows-v1-20260717.1
+            - --version=windows-v1-20260717.2
             - --node-id=$(KUBE_NODE_NAME)
-            - --manager-url=http://longhorn-backend:9500/v1
+            # Each Windows node has a local HostProcess manager. Using its
+            # loopback API avoids coupling CSI startup to overlay Service VIPs.
+            - --manager-url=http://127.0.0.1:9500/v1
             - --endpoint=$(CSI_ENDPOINT)
           env:
             - name: CSI_ENDPOINT
@@ -255,14 +269,14 @@ kind: Setting
 metadata:
   name: default-engine-image
   namespace: longhorn-system
-value: ghcr.io/appmana/longhorn-engine:windows-v1-20260717.1
+value: ghcr.io/appmana/longhorn-engine:windows-v1-20260717.2
 ---
 apiVersion: longhorn.io/v1beta2
 kind: Setting
 metadata:
   name: default-instance-manager-image
   namespace: longhorn-system
-value: ghcr.io/appmana/longhorn-instance-manager:windows-v1-20260717.1
+value: ghcr.io/appmana/longhorn-instance-manager:windows-v1-20260717.2
 ---
 # Expose the standard OS label through CSI topology before a delayed-binding
 # Windows PVC selects a node. Linux CSI nodes already source this key from the

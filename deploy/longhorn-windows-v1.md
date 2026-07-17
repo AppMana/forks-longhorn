@@ -21,8 +21,12 @@ add-on's Windows-aware controllers create their Windows peers separately.
 
 Windows nodes must be Server editions with HostProcess support, a running
 `MSiSCSI` service, and a writable `C:\var\lib\longhorn`. The supplied test
-harness provisions these requirements. `longhorn-windows-ntfs` and
+harness provisions these requirements and opens TCP 3260, 8500-8501, 9500,
+and 10000-20000 on its isolated data network. `longhorn-windows-ntfs` and
 `longhorn-windows-refs` use delayed binding and advertise Windows topology.
+The Windows CSI node service uses its node-local manager API; Windows managers
+fall back to the kubelet's local API endpoint when an HNS implementation does
+not make the Kubernetes Service VIP reachable from HostProcess containers.
 
 The Windows V1 capability set is intentionally fail-closed. RWO/RWOP volumes
 may use mixed Linux/Windows replicas. RWX and strict-local requirements cannot
