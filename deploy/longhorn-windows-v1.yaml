@@ -1,12 +1,10 @@
 # Optional Windows Server V1 data-path add-on. Install the normal Longhorn
 # chart first, configured with the same coordinated multi-platform manager,
-# engine, and instance-manager image references used below. Replace every
-# :windows-v1-dev reference with the corresponding published OCI image index;
-# do not combine a Windows-only engine tag with a different Linux engine tag.
-# The public-fork workflows publish coordinated release-set references as
-# ghcr.io/<owner>/{longhorn-manager,longhorn-engine,longhorn-instance-manager,
-# csi-proxy}:<shared-tag>. Engine upgrade tests use a second, immutable engine
-# tag rather than repointing the first tag.
+# engine, and instance-manager image references pinned below. Do not combine a
+# Windows-only engine tag with a different Linux engine tag. The public-fork
+# workflows publish each platform on its matching runner, then assemble these
+# coordinated OCI indexes. Engine upgrade tests use a second, immutable engine
+# tag rather than repointing this release-set tag.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -67,7 +65,7 @@ spec:
           runAsUserName: NT AUTHORITY\SYSTEM
       containers:
         - name: longhorn-manager
-          image: longhornio/longhorn-manager:windows-v1-dev
+          image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.1
           imagePullPolicy: IfNotPresent
           command:
             - C:\usr\local\bin\longhorn-manager.exe
@@ -75,9 +73,9 @@ spec:
             - -d
             - daemon
             - --engine-image
-            - longhornio/longhorn-engine:windows-v1-dev
+            - ghcr.io/appmana/longhorn-engine:windows-v1-20260717.1
             - --instance-manager-image
-            - longhornio/longhorn-instance-manager:windows-v1-dev
+            - ghcr.io/appmana/longhorn-instance-manager:windows-v1-20260717.1
             - --share-manager-image
             - longhornio/longhorn-share-manager:v1.12.0
             - --backing-image-manager-image
@@ -85,7 +83,7 @@ spec:
             - --support-bundle-manager-image
             - longhornio/support-bundle-kit:v0.0.86
             - --manager-image
-            - longhornio/longhorn-manager:windows-v1-dev
+            - ghcr.io/appmana/longhorn-manager:windows-v1-20260717.1
             - --service-account
             - longhorn-service-account
           env:
@@ -168,7 +166,7 @@ spec:
           runAsUserName: NT AUTHORITY\SYSTEM
       containers:
         - name: csi-proxy
-          image: longhornio/csi-proxy:windows-v1-dev
+          image: ghcr.io/appmana/csi-proxy:windows-v1-20260717.1
           imagePullPolicy: IfNotPresent
           command:
             - C:\usr\local\bin\csi-proxy.exe
@@ -231,13 +229,13 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
         - name: longhorn-csi-plugin
-          image: longhornio/longhorn-manager:windows-v1-dev
+          image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.1
           imagePullPolicy: IfNotPresent
           command:
             - C:\usr\local\bin\longhorn-windows-csi.exe
           args:
             - --driver-name=driver.longhorn.io
-            - --version=windows-v1-dev
+            - --version=windows-v1-20260717.1
             - --node-id=$(KUBE_NODE_NAME)
             - --manager-url=http://longhorn-backend:9500/v1
             - --endpoint=$(CSI_ENDPOINT)
@@ -248,6 +246,23 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+---
+# Keep the Linux and Windows controllers on the same multi-platform engine and
+# instance-manager indexes. Applying this add-on after the chart updates the
+# pre-existing settings rather than creating a platform-specific data path.
+apiVersion: longhorn.io/v1beta2
+kind: Setting
+metadata:
+  name: default-engine-image
+  namespace: longhorn-system
+value: ghcr.io/appmana/longhorn-engine:windows-v1-20260717.1
+---
+apiVersion: longhorn.io/v1beta2
+kind: Setting
+metadata:
+  name: default-instance-manager-image
+  namespace: longhorn-system
+value: ghcr.io/appmana/longhorn-instance-manager:windows-v1-20260717.1
 ---
 # Expose the standard OS label through CSI topology before a delayed-binding
 # Windows PVC selects a node. Linux CSI nodes already source this key from the
