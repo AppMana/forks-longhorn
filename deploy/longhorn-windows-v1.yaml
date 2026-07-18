@@ -175,7 +175,7 @@ spec:
           runAsUserName: NT AUTHORITY\SYSTEM
       containers:
         - name: csi-proxy
-          image: ghcr.io/appmana/csi-proxy:windows-v1-20260717.6
+          image: ghcr.io/appmana/csi-proxy:windows-v1-20260717.9
           imagePullPolicy: IfNotPresent
           securityContext:
             windowsOptions:
