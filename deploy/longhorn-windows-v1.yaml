@@ -66,7 +66,7 @@ spec:
           runAsUserName: NT AUTHORITY\SYSTEM
       containers:
         - name: longhorn-manager
-          image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.12
+          image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.13
           imagePullPolicy: IfNotPresent
           securityContext:
             windowsOptions:
@@ -91,7 +91,7 @@ spec:
             - --support-bundle-manager-image
             - longhornio/support-bundle-kit:v0.0.86
             - --manager-image
-            - ghcr.io/appmana/longhorn-manager:windows-v1-20260717.12
+            - ghcr.io/appmana/longhorn-manager:windows-v1-20260717.13
             - --service-account
             - longhorn-service-account
           env:
@@ -256,7 +256,7 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
         - name: longhorn-csi-plugin
-          image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.12
+          image: ghcr.io/appmana/longhorn-manager:windows-v1-20260717.13
           imagePullPolicy: IfNotPresent
           securityContext:
             windowsOptions:
@@ -269,7 +269,7 @@ spec:
           args:
             - '%CONTAINER_SANDBOX_MOUNT_POINT%\usr\local\bin\longhorn-windows-csi.exe'
             - --driver-name=driver.longhorn.io
-            - --version=windows-v1-20260717.12
+            - --version=windows-v1-20260717.13
             - --node-id=$(KUBE_NODE_NAME)
             # Each Windows node has a local host-network manager. Use the node
             # data address without coupling CSI startup to overlay Service VIPs.
