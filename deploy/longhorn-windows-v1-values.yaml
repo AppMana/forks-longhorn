@@ -9,7 +9,7 @@ image:
     manager:
       registry: ghcr.io
       repository: appmana/longhorn-manager
-      tag: windows-v1-20260717.10
+      tag: windows-v1-20260717.12
     instanceManager:
       registry: ghcr.io
       repository: appmana/longhorn-instance-manager
