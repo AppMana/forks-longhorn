@@ -83,7 +83,7 @@ spec:
             - --engine-image
             - ghcr.io/appmana/longhorn-engine:windows-v1-20260717.5
             - --instance-manager-image
-            - ghcr.io/appmana/longhorn-instance-manager:windows-v1-20260717.5
+            - ghcr.io/appmana/longhorn-instance-manager:windows-v1-20260717.6
             - --share-manager-image
             - longhornio/longhorn-share-manager:v1.12.0
             - --backing-image-manager-image

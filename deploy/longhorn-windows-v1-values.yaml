@@ -13,7 +13,7 @@ image:
     instanceManager:
       registry: ghcr.io
       repository: appmana/longhorn-instance-manager
-      tag: windows-v1-20260717.5
+      tag: windows-v1-20260717.6
 
 # Every stock workload contains Linux commands or paths. Windows equivalents
 # are separate so ordinary Longhorn upgrades retain their normal lifecycle.
